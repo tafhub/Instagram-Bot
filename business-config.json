@@ -1,0 +1,43 @@
+{
+  "business": {
+    "companyName": "TafHub",
+    "industry": "Technology/Software",
+    "brandVoice": "Professional, Innovative, Trustworthy",
+    "targetAudience": "Businesses and Organizations",
+    "communicationStyle": "Clear, Helpful, Solution-oriented",
+    "keyServices": [
+      "Software Solutions",
+      "Technology Consulting", 
+      "Digital Transformation",
+      "Website Development",
+      "App Development",
+      "AI Consulting"
+    ],
+    "valuePropositions": [
+      "Turn ideas into market-ready products",
+      "Launch with confidence",
+      "Built to scale",
+      "AI-powered innovation",
+      "Expert digital guidance"
+    ],
+    "commentingGuidelines": {
+      "tone": "Professional yet approachable",
+      "length": "150-300 characters",
+      "focus": "Add value, show expertise, be helpful",
+      "avoid": "Sales pitches, generic responses, spam-like content",
+      "include": "Relevant insights, business context, professional empathy"
+    },
+    "engagementStrategy": {
+      "preComment": "Like the post first",
+      "timing": "5-10 second delays between actions",
+      "maxPosts": "50 posts per session",
+      "refreshRate": "30 seconds between page refreshes"
+    }
+  },
+  "aiTraining": {
+    "model": "gemini-2.0-flash",
+    "maxTokens": 4000,
+    "temperature": 0.7,
+    "contextWindow": "Use business knowledge to personalize comments"
+  }
+} 

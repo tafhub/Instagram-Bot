@@ -1,0 +1,52 @@
+{
+  "tafhubTraining": {
+    "baseUrl": "https://tafhub.com/",
+    "targetPages": [
+      "https://tafhub.com/",
+      "https://tafhub.com/about",
+      "https://tafhub.com/services",
+      "https://tafhub.com/contact",
+      "https://tafhub.com/blog"
+    ],
+    "contentSelectors": [
+      "main",
+      "#main",
+      ".main",
+      "article",
+      ".content",
+      "#content"
+    ],
+    "excludeSelectors": [
+      "nav",
+      "header",
+      "footer",
+      ".sidebar",
+      ".navigation"
+    ],
+    "trainingParameters": {
+      "maxContentLength": 5000,
+      "minContentLength": 100,
+      "delayBetweenRequests": 2000,
+      "timeout": 30000,
+      "maxPages": 20
+    },
+    "aiTraining": {
+      "model": "gemini-2.0-flash",
+      "maxTokens": 4000,
+      "temperature": 0.7,
+      "trainingPrompt": "Analyze the TafHub website content and learn their business model, target audience, brand voice, and communication style."
+    }
+  },
+  "businessContext": {
+    "companyName": "TafHub",
+    "industry": "Technology/Software",
+    "targetAudience": "Businesses and organizations",
+    "keyServices": [
+      "Software solutions",
+      "Technology consulting",
+      "Digital transformation"
+    ],
+    "brandVoice": "Professional, innovative, trustworthy",
+    "communicationStyle": "Clear, helpful, solution-oriented"
+  }
+} 

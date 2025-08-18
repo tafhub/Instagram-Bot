@@ -7,7 +7,10 @@
     "postbuild": "copyfiles -u 3 src/Agent/characters/*.json build/Agent/characters",
     "train-model": "tsc && node build/Agent/training/Model.js",
     "train:link": "tsc && node build/Agent/training/WebsiteScraping.js",
-    "train:audio": "tsc && node build/Agent/training/TrainWithAudio.js"
+    "train:audio": "tsc && node build/Agent/training/TrainWithAudio.js",
+    "train:tafhub": "tsc && node build/Agent/training/TafHubTraining.js",
+    "extract-business": "tsc && node extract-business-data.js",
+    "test-business": "tsc && node test-business-integration.js"
   },
   "keywords": [],
   "author": "",

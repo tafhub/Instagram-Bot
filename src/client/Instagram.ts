@@ -9,6 +9,7 @@ import logger from "../config/logger";
 import { Instagram_cookiesExist, loadCookies, saveCookies } from "../utils";
 import { runAgent } from "../Agent";
 import { getInstagramCommentSchema } from "../Agent/schema";
+import { getBusinessData } from "../utils/extractBusinessData";
 
 // Add stealth plugin to puppeteer
 puppeteer.use(StealthPlugin());
@@ -21,6 +22,44 @@ puppeteer.use(
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Function to create business-aware comment prompts
+async function createBusinessAwarePrompt(caption: string): Promise<string> {
+    try {
+        const businessData = await getBusinessData();
+        
+        const enhancedPrompt = `
+Based on ${businessData.companyName}'s expertise in ${businessData.keyServices.slice(0, 3).join(', ')}, 
+craft a thoughtful, engaging, and mature reply to the following post: "${caption}"
+
+Business Context:
+- Company: ${businessData.companyName}
+- Industry: ${businessData.industry}
+- Brand Voice: ${businessData.brandVoice}
+- Target Audience: ${businessData.targetAudience}
+- Communication Style: ${businessData.communicationStyle}
+
+Key Services: ${businessData.keyServices.slice(0, 3).join(', ')}
+
+Requirements:
+- Reply should be relevant, insightful, and add value to the conversation
+- Reflect ${businessData.companyName}'s professional approach and expertise
+- Use ${businessData.communicationStyle} tone
+- 300 characters or less
+- Must not violate Instagram Community Standards on spam
+- Humanize the reply to sound natural and engaging
+- Consider how ${businessData.companyName}'s services could help the poster
+
+Generate a comment that positions ${businessData.companyName} as a helpful expert in ${businessData.industry}.
+`;
+
+        return enhancedPrompt;
+    } catch (error) {
+        console.log('Error loading business data, using fallback prompt:', error);
+        // Fallback to original prompt if business data fails to load
+        return `Craft a thoughtful, engaging, and mature reply to the following post: "${caption}". Ensure the reply is relevant, insightful, and adds value to the conversation. It should reflect empathy and professionalism, and avoid sounding too casual or superficial. also it should be 300 characters or less. and it should not go against instagram Community Standards on spam. so you will have to try your best to humanize the reply`;
+    }
+}
+
 async function runInstagram() {
     const server = new Server({ port: 8000 });
     await server.listen();
@@ -29,6 +68,20 @@ async function runInstagram() {
         headless: false,
         args: [`--proxy-server=${proxyUrl}`],
     });
+
+    // Load business data at startup
+    try {
+        const businessData = await getBusinessData();
+        console.log('🚀 Business Data Loaded Successfully!');
+        console.log(`🏢 Company: ${businessData.companyName}`);
+        console.log(`🎨 Brand Voice: ${businessData.brandVoice}`);
+        console.log(`👥 Target Audience: ${businessData.targetAudience}`);
+        console.log(`🚀 Key Services: ${businessData.keyServices.slice(0, 3).join(', ')}`);
+        console.log('=====================================');
+    } catch (error) {
+        console.log('⚠️ Warning: Could not load business data, using fallback prompts');
+        console.log('Run "npm run extract-business" to set up business context');
+    }
 
     const page = await browser.newPage();
     const cookiesPath = "./cookies/Instagramcookies.json";
@@ -160,11 +213,22 @@ async function interactWithPosts(page: any) {
             const commentBox = await page.$(commentBoxSelector);
             if (commentBox) {
                 console.log(`Commenting on post ${postIndex}...`);
-                const prompt = `Craft a thoughtful, engaging, and mature reply to the following post: "${caption}". Ensure the reply is relevant, insightful, and adds value to the conversation. It should reflect empathy and professionalism, and avoid sounding too casual or superficial. also it should be 300 characters or less. and it should not go against instagram Community Standards on spam. so you will have to try your best to humanize the reply`;
+                
+                // Create business-aware prompt
+                const prompt = await createBusinessAwarePrompt(caption);
+                console.log(`Using business-aware prompt for post ${postIndex}...`);
+                
                 const schema = getInstagramCommentSchema();
                 const result = await runAgent(schema, prompt);
                 const comment = result[0]?.comment;
-                await commentBox.type(comment);
+                
+                if (comment) {
+                    console.log(`Generated comment: "${comment}"`);
+                    await commentBox.type(comment);
+                } else {
+                    console.log('No comment generated, skipping this post');
+                    continue;
+                }
 
                 // New selector approach for the post button
                 const postButton = await page.evaluateHandle(() => {
